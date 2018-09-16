@@ -1,0 +1,24 @@
+Requisitos:
+
+EMG:
+	- O EMG deverá possuir 2 canais
+	- Considerando um ganho de 1000, o ADC deverá ter um sampling range de +-5V
+	- Considerando um ganho de 100, o ADC deverá ter um sampling range de +-0.5V
+	- Considerando uma taxa de aquisição 5x > que o sinal do musculo(50kHz), o intevalo de aquisição do ADC deverá ser <20us
+	- O EMG deverá ser capaz de ler sinais de até 10Khz
+	- O ADC deverá ter resolução de 16 bits
+	- A leitura pelo computador deverá ser feita pela porta USB 2.0 (min)
+		- Conversor FTDI	
+	
+https://www.medicine.mcgill.ca/physio/vlab/biomed_signals/atodvlab.htm 
+
+Resolution = voltage range / 2^bits
+
+EMG - 
+	- 2 Canais
+	- ADC 16bits (Adc Ads1115 I2c 16 Bits)
+	- Freq. aq. 2500kHz (considerando um corte entre 20Hz e 500Hz) (5x nyquist)
+	- uC ATMega328P (p/ comunicacao c/ ADC)
+	- BaudRate 115200
+	- Interface com pc usando um convr.  FTDI FT232RL (USB 2.0)
+	
