@@ -1,0 +1,21 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+eixo_x	../plot_leg_titles.py	/^eixo_x = [1,2,3] # valores do eixo x$/;"	kind:variable	line:11
+eixo_x2	../plot_leg_titles.py	/^eixo_x2 = [1,2,3]$/;"	kind:variable	line:14
+eixo_y	../plot_leg_titles.py	/^eixo_y = [5,7,4] # valores do eixo y$/;"	kind:variable	line:12
+eixo_y2	../plot_leg_titles.py	/^eixo_y2 = [9,1,0]$/;"	kind:variable	line:15
+grafico_barras.py	../grafico_barras.py	1;"	kind:file	line:1
+histograma.py	../histograma.py	1;"	kind:file	line:1
+image	../histograma.py	/^image = img.load("\/media\/camargos\/Dados\/UFU\/EngenhariaBiomedica\/2018-2\/IM2\/Codigos\/imagens-base\/mamaoriginal.jpg",'jpg')$/;"	kind:variable	line:8
+main.py	../main.py	1;"	kind:file	line:1
+plot_leg_titles.py	../plot_leg_titles.py	1;"	kind:file	line:1
+population_ages	../histograma.py	/^population_ages = [22,44,55,66,43,12,54,65,72,34,34,23,12,12,22,22,11,11,15,65,34,23,87,45,100,123,121,11,11]$/;"	kind:variable	line:10
+x	../grafico_barras.py	/^x = np.array([2,4,6,8,10])$/;"	kind:variable	line:6
+x2	../grafico_barras.py	/^x2 = np.array([2,4,6,8,10]) + 1$/;"	kind:variable	line:9
+xvalues	../histograma.py	/^xvalues = [x for x in range(10,150,10)]$/;"	kind:variable	line:12
+y	../grafico_barras.py	/^y = np.array([6,7,8,4,2])$/;"	kind:variable	line:7
+y2	../grafico_barras.py	/^y2 = np.array([6,7,8,4,2]) + 1$/;"	kind:variable	line:10
