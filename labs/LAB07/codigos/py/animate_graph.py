@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt     # Importando bibliotecas necessárias para execução do programa
 import matplotlib.animation as animation
-import serial   
+import serial
 import time
 from matplotlib import style
 
@@ -17,7 +17,7 @@ comport.write(b'R') # Valor escrito para o arduino; 'R' para começar a ler
 
 # Figura em que o gráfico será renderizado
 fig = plt.figure()              # criando uma nova figura
-ax1 = fig.add_subplot(1,1,1)    # subplot 
+ax1 = fig.add_subplot(1,1,1)    # subplot
 
 tensao = [0] # Vetor que armazena valor do arduino
 tempo = [0]  # Vetor que armazena indices de leitura
@@ -30,15 +30,15 @@ def animate(i):
     # print(f"leitura arduino {leitura_arduino}")
     if leitura_arduino != b'\r\n'  : # Checkando se o valor é válido
         tensao.append(float(leitura_arduino)/100.0) # Convetendo para float (0 - 5.5)
-        tempo.appendtempo[-1] + 1)                 # Atualizando indice
+        tempo.append(tempo[-1] + 1)                 # Atualizando indice
         ax1.clear()                                 # Limpa o plot
         ax1.plot(tempo, tensao, label=f"Tensão: {tensao[-1]}V") # Ploat os novos valores
         ax1.legend(loc="upper left")                # Inserindo legenda
 
         if len(tensao)>50:  # Se o gráfico tem mais de 50 pontos
-            tensao.pop(0)   # exlclui o valor mais antigo                               
+            tensao.pop(0)   # exlclui o valor mais antigo
             tempo.pop(0)    # exlclui o valor mais antigo
 
 
-ani = animation.FuncAnimation(fig, animate, interval=100) # funcao responsável pela animacao
+ani = animation.FuncAnimation(fig, animate, interval=1) # funcao responsável pela animacao
 plt.show()  # Exibindo o plot no monitor do notebook

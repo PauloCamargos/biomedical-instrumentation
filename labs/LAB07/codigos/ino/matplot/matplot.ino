@@ -26,6 +26,6 @@ void loop() {
     valor_lido = analogRead(PIN_ANALOG); // Lendo o pino PIN_ANALOG = A0 do arduino
     tensao = 100 * (5.0 * valor_lido / 1023.0);  // convertendo bits (0 - 1023) para tensão (0 - 5.0 * 100)
     Serial.println(tensao);        // Enviando o valor pelo pino serial
-    delay(100); // aguarda 100ms para proxima leitura
+    delay(10); // aguarda 100ms para proxima leitura
   }
 }
