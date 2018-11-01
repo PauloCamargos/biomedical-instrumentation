@@ -23,7 +23,7 @@ window = pg.GraphicsWindow(title="Real Time ECG")   # Titulo da janela
 window.useOpenGL                            # Configurando engine para renderização do gráfico
 
 plot = window.addPlot(title="Sinal ECG")    # Iniciando um plot
-plot.setRange(yRange=[-3,3])                # Limites do gráfico
+plot.setRange(yRange=[-1,0])                # Limites do gráfico
 plot.addLegend()                            # Inserindo lengeda
 plot.showGrid(x = True, y = True, alpha = 0.2)      # Grid para visualização dos valores
 plot.setLabel('left', 'Tensão [V]')         # Legenda do eixo y
@@ -37,7 +37,8 @@ def update():
     leitura_arduino = comport.readline()    # Lendo o valor da arduino
 
     if leitura_arduino != b'\r\n'  : # Checkando se o valor é válido
-        tensao.append(float(leitura_arduino)/100.0 - 2.5)   # Inserindo o valor lido ao vetor 'tensao'
+        tensao_ecg = float(leitura_arduino)/100.0 - 1.65
+        tensao.append(tensao_ecg)   # Inserindo o valor lido ao vetor 'tensao'
         tensao.pop(0)                      # deletando o valor mais antigo do vetor 'tensao'
         tensaonp = np.array(tensao[-500:], dtype='float')   # Convertendo o vetor 'tensao' do tipo array para numpy array
         curva.setData(tensaonp) # Passando os valores do vetor para a curva
@@ -46,7 +47,7 @@ def update():
         app.processEvents()     # Atualizando a interface (janela do gráfico)
     
 timer = QtCore.QTimer()         # Temporizador da biblioteca 
-timer.timeout.connect(update)   
+timer.timeout.connect(update)  
 timer.start(0)                  
 
 if __name__ == '__main__': # Função iniciando a execução da janela
