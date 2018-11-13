@@ -21,29 +21,38 @@ pg.setConfigOptions(antialias=True)             # Bordas das curvas
 window = pg.GraphicsWindow(title="Real Time ECG")   # Titulo da janela
 # window.size(600,400)
 window.useOpenGL                            # Configurando engine para renderização do gráfico
+pg.setConfigOptions(useOpenGL=True)
 
+limit = 2 
 plot = window.addPlot(title="Sinal ECG")    # Iniciando um plot
-plot.setRange(yRange=[-1,0])                # Limites do gráfico
+plot.setRange(yRange=[-limit,limit])                # Limites do gráfico
 plot.addLegend()                            # Inserindo lengeda
 plot.showGrid(x = True, y = True, alpha = 0.2)      # Grid para visualização dos valores
 plot.setLabel('left', 'Tensão [V]')         # Legenda do eixo y
 
 tensao = [0] * 500 # Criando array de zeros. Vetor com os valores de tensão 
-curva = plot.plot(pen='g',name="[V]")   # Curva do gráfico
+curva = plot.plot(pen=pg.mkPen(color='y',width=2),name="[V]")   # Curva do gráfico
+
+# Texto mostrando valor 
+# texto = pg.TextItem(text="Valor",anchor=(0,0), border='w', fill=(0, 0, 255, 100))
+# plot.addItem(texto)
+
 x = 0   # variável contendo o índice
 
 def update():
     global tensao, curva, x
     leitura_arduino = comport.readline()    # Lendo o valor da arduino
 
-    if leitura_arduino != b'\r\n'  : # Checkando se o valor é válido
-        tensao_ecg = float(leitura_arduino)/100.0 - 1.65
+    if leitura_arduino != b'\r\n' and leitura_arduino != b'\n': # Checkando se o valor é válido
+        tensao_ecg = float(leitura_arduino) / 100.0 - 1.65
+        # tensao_ecg = float(leitura_arduino)/100.0 - 1.65
         tensao.append(tensao_ecg)   # Inserindo o valor lido ao vetor 'tensao'
         tensao.pop(0)                      # deletando o valor mais antigo do vetor 'tensao'
         tensaonp = np.array(tensao[-500:], dtype='float')   # Convertendo o vetor 'tensao' do tipo array para numpy array
         curva.setData(tensaonp) # Passando os valores do vetor para a curva
         x += 1                  # Atualizando o índice da leitura
         curva.setPos(x, 0)       # Valor do eixo x e seu deslocamento verticalmente
+        plot.setLabel('bottom',"Tensão [V]: " + "{0:.2f}".format(tensaonp.item(499)))
         app.processEvents()     # Atualizando a interface (janela do gráfico)
     
 timer = QtCore.QTimer()         # Temporizador da biblioteca 

@@ -1,19 +1,26 @@
 # Comandos
 
-Antes de tudo, instale o pacote Anaconda. Digite os comandos a seguir para rodar o código
+    Obs.: 
+    - O sinal enviado pela porta serial deve estar com um delay de 20ms no mínimo.
+    - Ferramentas principais utilizadas: Python 3.6+ e PyQt5
 
-- Configure o ambiente:
+
+Antes de tudo, instale o pacote [Miniconda ](https://conda.io/miniconda.html) ou [Anaconda](https://www.anaconda.com/download). Digite os comandos a seguir para rodar o código
+
+- Configure o ambiente (apenas se você ainda não configurou):
   
-1. `sudo apt-get install python-qt4 pyqt4-dev-tools`
+    `sudo apt-get install pyqt5`
 
-2. `conda create -n realtimeplotter python=2.7 matplotlib scipy numpy pyqtgraph pyserial`
+    `conda create -n inbio matplotlib scipy numpy pyqtgraph pyserial`
 
 - Para rodar o código:
-1. Ative o ambiente: 
+    - Ative o ambiente: 
     
-    `source actiavate realtimeplotter`
+        `source actiavate inbio`
 
-2. `python main.py`
+    - Execute o programa:
+
+        `python main.py`
 
 
 
