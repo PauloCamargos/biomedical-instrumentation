@@ -39,6 +39,10 @@ client.on_disconnect=on_disconnet
 client.on_log=on_log
 client.on_message=on_message
 
+def execute_movement(topic, movement):
+    # Publicando um valor neste topico
+    client.publish(topic, movement)
+
 # DEBUG
 print("Conectando ao broker ", broker)
 
@@ -47,12 +51,16 @@ client.connect(broker,port=1883)
 client.loop_start()
 
 # Subscrevendo a um novo topico
-topico = 'move'
-client.subscribe(topico)
-# Publicando um valor neste topico
-client.publish(topico, "Hello World!")
+topic = 'move'
+client.subscribe(topic)
 
-while topico == 'move':
+
+# Array de comandos
+moves = ['down', 'up', 'left', 'right', 's', 'p']
+
+for m in moves:
+    execute_movement(topic, m)
+    print(f"Executando o movimento {m}")
     time.sleep(5)
 
 # Fechando a conexãa
