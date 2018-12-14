@@ -46,30 +46,30 @@ public class Player : MonoBehaviour
     {
         switch (msg)
         {
-            case "down":
+            case "fechar":
                 anim.SetBool("play_fechar", true);
                 Debug.Log("Fechando a mão...");
                 break;
-            case "up":
+            case "abrir":
                 anim.SetBool("play_fechar", false);
                 Debug.Log("Abrindo a mão...");
                 break;
-            case "left":
+            case "flexionar":
                 anim.SetBool("play_flexao", true);
                 Debug.Log("Realizando flexão da mão...");
                 break;
 
-            case "right":
+            case "estender":
                 anim.SetBool("play_flexao", false);
                 Debug.Log("Realizando extensão da mão...");
                 break;
 
-            case "s":
+            case "supinar":
                 anim.SetTrigger("play_supinacao");
                 Debug.Log("Realizando supinação da mão...");
                 break;
 
-            case "p":
+            case "pronar":
                 anim.SetTrigger("play_pronacao");
                 Debug.Log("Realizando pronação da mão...");
                 break;

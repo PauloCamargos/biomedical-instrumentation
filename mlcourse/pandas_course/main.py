@@ -48,7 +48,7 @@ df.temperature.std()
 df.describe()
 
 # selecting with conditions
-df[df.temperature>32]
+df[df.  >32]
 df[df.temperature==df.temperature.max()]
 df[['day', 'temperature']][df.temperature==df.temperature.max()]
 # If the column name has spaces, use the other sintax
