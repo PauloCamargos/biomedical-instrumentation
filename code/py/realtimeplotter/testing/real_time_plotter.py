@@ -5,7 +5,7 @@ import pyqtgraph as pg
 import serial
 import time
 
-caminho_porta = "/dev/ttyACM0"      # Porta a qual o Ard. está conectado (ACM0, ACM1 OU ACM2)
+caminho_porta = "COM3"      # Porta a qual o Ard. está conectado (ACM0, ACM1 OU ACM2)
 baud = 115200                       # Taxa de transferência (a mesma do firm. no Ard.)
 timeout = 3                        # Tempo (s) limite para de tentativa de encontar a conexao
 
@@ -31,7 +31,7 @@ plot.showGrid(x = True, y = True, alpha = 0.2)      # Grid para visualização d
 plot.setLabel('left', 'Tensão [V]')         # Legenda do eixo y
 
 tensao = [0] * 500 # Criando array de zeros. Vetor com os valores de tensão 
-curva = plot.plot(pen=pg.mkPen(color='y',width=2),name="[V]")   # Curva do gráfico
+curva = plot.plot(pen=pg.mkPen(color='y',width=1),name="[V]")   # Curva do gráfico
 
 # Texto mostrando valor 
 # texto = pg.TextItem(text="Valor",anchor=(0,0), border='w', fill=(0, 0, 255, 100))
