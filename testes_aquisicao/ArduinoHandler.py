@@ -66,9 +66,6 @@ class ArduinoHandler:
     --------
     See the code of the test function in this file for two command line examples.
     """
-
-    __instance = None
-
     def __init__(self, port_name=None, baudrate=115200, qnt_ch=1):
         self.qnt_ch = qnt_ch
         if port_name is None:
@@ -223,17 +220,6 @@ class ArduinoHandler:
         """
         return "Serial: %4d" % (self.serialPort.inWaiting()/4 if self.serialPort.isOpen() else 0) + '/' + str(4096/4) +\
                separator + "Acq: %4d" % (self.buffer_acquisition.qsize()) + '/' + str(self.buffer_acquisition.maxsize)
-
-    @staticmethod
-    def instance(port_name, baudrate, qnt_ch):
-        """
-        Creates an instance of the ArduinoHandler class:
-        :return: An ArduinoHandler object.
-        """
-
-        if not ArduinoHandler.__instance:
-            ArduinoHandler.__instance = ArduinoHandler(port_name=port_name, baudrate=baudrate, qnt_ch=qnt_ch)
-        return ArduinoHandler.__instance
 
 
 def test():

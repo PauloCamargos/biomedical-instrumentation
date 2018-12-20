@@ -6,61 +6,50 @@ from pyqtgraph.Qt import QtGui, QtCore
 import numpy as np
 import pyqtgraph as pg
 import serial
-import time
-import commhandler
+import time as py_time
+from numpy import clip
+from pyqtgraph.ptime import time
 from queue import Queue
+from ArduinoHandler import ArduinoHandler
+from ThreadHandler import ThreadHandler
+from collections import deque
+from threading import Thread 
 
-class PyQtGraphSeries:
-    def __init__(self, parent=None, pen=(0, 0, 255), name="Curve"):
-        """
-        Initializes a custom PyQtGraphCurve with a auxiliary vector of values and a buffer.
-        :param parent: The parent, it should contains a PyQtPlotWidget that will own this curve.
-        :param pen: The RGB color of the curve. Default is blue.
-        :param name: The name of the curve. Default is 'Curve'
-        """
-        self.parent = parent  # Save the parent in a attribute.
-        self.values = [0] * self.parent.qnt_points  # Initilizes a zero-filled vector
-        # Creates and adds the curve to the plotwidget.
-        self.curve = self.parent.plotWidget.plot(self.values, pen=pen, name=name)
-        self.visible = True
-        self.buffer = Queue(self.parent.qnt_points)
+my_arduino_handler = ArduinoHandler.instance(port_name='COM3', baudrate=115200, qnt_ch=2)
+my_arduino_handler.start_acquisition()
 
-    def set_visible(self, visible):
-        """
-        Adds or removes the curve of the parent plot widget.
-        :param visible: Boolean telling that the curve should appear (True) or hide (False).
-        """
-        self.visible = visible  # Save the argument as as attribute
-        if not self.visible:
-            self.parent.plotWidget.removeItem(self.curve)
-        else:
-            self.parent.plotWidget.addItem(self.curve)
+buffer_plotter = Queue(4096)
 
-    def update_values(self):
-        """
-        This method is called automatically, you should not call it by yourself.
+# class ThreadConsumer(Thread):
+#     def __init__(self, my_arduino_handler, buffer_plotter):
+#         Thread.__init__(self)
+#         self.daemon = True
+#         self.running = True
+#         self.my_arduino_handler = my_arduino_handler
+#         self.buffer_plotter = buffer_plotter
 
-        It verifies how many points are in the buffer,
-        then remove one by one, and add to the auxiliary vector.
-        This auxiliary vector is set as the data source of the curve in the plot.
-        """
-        points_to_add = self.buffer.qsize()
-        if points_to_add > 0:
-            for n in range(points_to_add):  # obtains the new values
-                num = self.buffer.get()
-                self.values.append(num)
-                if len(self.values) > self.parent.qnt_points:
-                    self.values.pop(0)
-        if self.visible:
-            self.curve.setData(self.values)
+#     def run(self):
+#         while self.running:
+#             if my_arduino_handler.data_wating > 0:
+#                 buffer_plotter.put(my_arduino_handler.buffer_acquisition.get())
 
-    def get_buffers_status(self):
-        """
-        Returns a string like:
-            Plot:    4/1024
-        :return: A string containing the status of the plot buffer for this curve.
-        """
-        return "Plot: %4d" % (self.buffer.qsize()) + '/' + str(self.buffer.maxsize)
+#     def stop(self):
+#         self.running = False
+
+
+# thr_consumer = ThreadConsumer(my_arduino_handler, buffer_plotter)
+# thr_consumer.start()
+
+# def consumer():
+#     while True:
+#         if my_arduino_handler.data_wating > 0:
+#             buffer_plotter.put(my_arduino_handler.buffer_acquisition.get())
+
+# thr_consumer = Thread(target=consumer)
+# thr_consumer.daemon = True
+# thr_consumer.start()
+# thr_consumer.join()
+
 
 class CustomPlotEMG(pg.GraphicsWindow):
     """
@@ -69,64 +58,112 @@ class CustomPlotEMG(pg.GraphicsWindow):
         "Embedding widgets inside PyQt applications".
     """
 
-    def __init__(self, parent=None):
-        self.amount_of_points = 10       
+    def __init__(self, parent=None,whoami=1): 
         pg.GraphicsWindow.__init__(self, parent=None)
+        self.whoami = whoami
+        self.amount_of_points = 15000 
+        self.values = [0] * self.amount_of_points 
+
+        self.fps = 0
+        self.show_fps = True
+        self.lastTime = 0
+
         pg.setConfigOptions(antialias=True)             # Bordas das curvas
-        # self.setWindowTitle("Real Time Potentiometer")
-        # window.size(600,400)
         self.useOpenGL                            # Configurando engine para renderização do gráfico
         pg.setConfigOptions(useOpenGL=True)
 
-        limit = 2 
-        plot = self.addPlot(title="Sinal EMG")    # Iniciando um plot
-        plot.setRange(yRange=[-limit,limit])                # Limites do gráfico
-        plot.addLegend()                            # Inserindo lengeda
-        plot.showGrid(x = True, y = True, alpha = 0.2)      # Grid para visualização dos valores
-        plot.setLabel('left', 'Tensão [V]')         # Legenda do eixo y
+        limit = 600 
+        self.plot = self.addPlot(title="Sinal EMG")    # Iniciando um plot
+        self.plot.setRange(yRange=[-10,1050])                # Limites do gráfico
+        self.plot.addLegend()                            # Inserindo lengeda
+        # self.plot.showGrid(x = True, y = True, alpha = 0.2)      # Grid para visualização dos valores
+        self.plot.setLabel('left', 'Tensão [V]')         # Legenda do eixo y
 
-        self.tensao = [0] * 500 # Criando array de zeros. Vetor com os valores de tensão 
-        self.curva = plot.plot(pen=pg.mkPen(color='y',width=0.5),name="[V]")   # Curva do gráfico
+        if whoami == 1:
+            name = 'CH1'
+            color = 'r'
+        else:
+            name = 'CH2'
+            color = 'b'
 
-        # Texto mostrando valor 
-        # texto = pg.TextItem(text="Valor",anchor=(0,0), border='w', fill=(0, 0, 255, 100))
-        # plot.addItem(texto)
+        self.curva = self.plot.plot(pen=pg.mkPen(color=color,width=1),name=name)   # Curva do gráfico
 
-        self.x = 0   # variável contendo o índice
+        timer = pg.QtCore.QTimer(self)         # Temporizador da biblioteca 
+        timer.timeout.connect(self.update)  
+        timer.start(50)   
+        self.x = 0
 
-        # Iniciando conexao serial
-        # self.comport = commhandler.ComportHandler().get_comport() # Abrindo a conexao serial arduino/notebook
-        # if not self.comport is None:
-        #     time.sleep(2)                                # Aguarda um tempo para iniciar comunicação
-        #     self.comport.write(b'R')                          # Escreve no arduino. Ordem para iniciar leitura ('R')
-        #     timer = pg.QtCore.QTimer(self)         # Temporizador da biblioteca 
-        #     timer.timeout.connect(self.update)  
-        #     timer.start(0)    # Number of seconds for the next update
+        print(f"QUEM SOU EU: {self.whoami}")
 
-    def update(self):
+    @staticmethod
+    def get_data():
+        buffer_plotter = my_arduino_handler.buffer_acquisition
+
         """ Updates the data and the graph"""
-        
-        # tensao = self.tensao
-        # curva = self.curva
-        # x = self.x
-        # leitura_arduino = self.comport.readline()    # Lendo o valor da arduino
+        # NOTE: FAZER O PLOT COM MAIS DADOS AO INVÉS DE ATUALIZAR PONTO A PONTO
+        points_to_add = buffer_plotter.qsize()
+        # print(f"POINTS TO add: {points_to_add}")
 
-        # if leitura_arduino != b'\r\n' and leitura_arduino != b'\n': # Checkando se o valor é válido
-        #     tensao_ecg = float(leitura_arduino) / 100.0 - 1.65
-        #     # tensao_ecg = float(leitura_arduino)/100.0 - 1.65
-        #     tensao.append(tensao_ecg)   # Inserindo o valor lido ao vetor 'tensao'
-        #     tensao.pop(0)                      # deletando o valor mais antigo do vetor 'tensao'
-        #     tensaonp = np.array(tensao[-500:], dtype='float')   # Convertendo o vetor 'tensao' do tipo array para numpy array
-        #     curva.setData(tensaonp) # Passando os valores do vetor para a curva
-        #     x += 1                  # Atualizando o índice da leitura
-        #     curva.setPos(x, 0)       # Valor do eixo x e seu deslocamento verticalmente
-        #     # self.plot.setLabel('bottom',"Tensão [V]: " + "{0:.2f}".format(tensaonp.item(499)))
+        if points_to_add > 0:
+            for n in range(points_to_add):  # obtains the new value
+                num = buffer_plotter.get()
+                
+                if self.whoami == 1:
+                    _val = num[0]
+                else:
+                    _val = num[1]
+
+                self.values.append(_val)
+                if len(self.values) > self.amount_of_points: # remove the oldest values
+                    self.values.pop(0)
+
+
+    def update(self): # este é o data consumer do pyqtgraph
+        # if self.show_fps:
+        #     self.calculate_fps()
+        #     self.plot.setTitle('<font color="red">%0.2f fps</font>' % self.fps)
+
+        buffer_plotter = my_arduino_handler.buffer_acquisition
+
+        """ Updates the data and the graph"""
+        # NOTE: FAZER O PLOT COM MAIS DADOS AO INVÉS DE ATUALIZAR PONTO A PONTO
+        points_to_add = buffer_plotter.qsize()
+        # print(f"POINTS TO add: {points_to_add}")
+
+        if points_to_add > 0:
+            for n in range(points_to_add):  # obtains the new value
+                num = buffer_plotter.get()
+                
+                if self.whoami == 1:
+                    _val = num[0]
+                else:
+                    _val = num[1]
+
+                self.values.append(_val)
+                if len(self.values) > self.amount_of_points: # remove the oldest values
+                    self.values.pop(0)
+
+            self.x += 1
+            self.curva.setData(np.array(self.values[-self.amount_of_points:], dtype='int'))
+            self.curva.setPos(self.x, 0)
+
+    def calculate_fps(self):
+        """
+        If defined, it this method is called automatically by the update function.
+        Updating the value of the fps attribute.
+        """
+        now = time()
+        dt = now - self.lastTime
+        self.lastTime = now
+        if self.fps is None:
+            self.fps = 1.0 / dt
+        else:
+            s = clip(dt * 3., 0, 1)
+            self.fps = self.fps * (1 - s) + (1.0 / dt) * s
 
 
 if __name__ == '__main__': # Função iniciando a execução da janela
-    # import sys
-    # if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-    #     QtGui.QApplication.instance().exec_()
     w = CustomPlotEMG()
     w.show()
     QtGui.QApplication.instance().exec_()
+

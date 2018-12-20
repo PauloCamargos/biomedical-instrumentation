@@ -1,4 +1,13 @@
 /***
+  Author: Paulo Camargos
+  Description: Program for testing data sending in high frequency on Arduino
+  Date: 18/12/2018
+
+  Packet description
+  For 1 channels:
+  Packet:  START | MSB  | LSB  | END
+  Exemple:  '$'  | 0x01 | 0x42 | '\n'
+  
   For 2 channels:
   Packet:  START | MSB1 | LSB1 | MSB2 | LSB2 | END
   Exemple:  '$'  | 0x01 | 0x42 | 0x01 | 0x33 | '\n'
@@ -13,7 +22,7 @@
 #define BAUDRATE 115200
 #define PACK_START '$'
 #define PACK_END   '\n'
-#define N_CH  2// Number of channels
+#define N_CH 2// Number of channels
 
 uint16_t read_analog_value[N_CH];
 
@@ -34,9 +43,9 @@ void read_value(){
   read_analog_value[1] = read_analog_value[0];
 
   //#ifndef PLOTTER_SERIAL
-  //send_data(); 
+  send_data(); 
   //else 
-  show_data(); 
+  //show_data(); 
   //#endif
 }
 
@@ -47,8 +56,10 @@ void send_data(){
   Serial.write(read_analog_value[0]>>8);
   Serial.write(read_analog_value[0]);
   // Second byte
-  Serial.write(read_analog_value[1]>>8);
-  Serial.write(read_analog_value[1]);
+  if(N_CH == 2){
+    Serial.write(read_analog_value[1]>>8);
+    Serial.write(read_analog_value[1]);
+  }
   // End byte
   Serial.write(PACK_END);
 }

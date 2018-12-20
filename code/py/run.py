@@ -7,10 +7,11 @@ from controller.unitycommunication import unity_comm
 import main_window # qt user interface file
 import sys
 import os
-import ThreadHandler # thanks to Ítalo and Andrei (see ThreadHandler docs.)
+# from ThreadHandler import ThreadHandler # thanks to Ítalo and Andrei (see ThreadHandler docs.)
 import threading
 
 #     movements = {1:'abrir', 2:'fechar', 3:'flexionar', 4:'estender', 5:'supinar', 6:'pronar'}
+
 
 class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -21,14 +22,13 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         # Thread for the execution of moves in unity. Blocking other buttons until 
         # the move is completed. At the end, this thread execute the
         #  method 'self.unlock_all_buttons'
-        self.thread_executing_move = ThreadHandler.ThreadHandler(
-            worker=unity_comm.relay_movement_command,
-            args=(self.current_move), 
-            on_end_function=self.unlock_all_buttons)
+        # self.thread_executing_move = ThreadHandler.ThreadHandler(
+        #     worker=unity_comm.relay_movement_command,
+        #     args=(self.current_move), 
+        #     on_end_function=self.unlock_all_buttons)
 
         # Setting up the buttons to their respective methods
-        self.setup_connections()
-        
+        self.setup_connections()        
 
     def setup_connections(self):
         """
@@ -47,56 +47,63 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         # Blocking all buttuns until the move is not completed.
         self.lock_all_buttons() 
         # Sending the move code and starting it's thread.
-        # self.current_move = 1
-        # self.thread_executing_move.args = self.current_move
-        # self.thread_executing_move.start()
-        #unity_comm.relay_movement_command(1)
-
         self.current_move = 1
-        self.thread_executing_move.args = self.current_move
-        self.thread_executing_move.start()
+        unity_comm.relay_movement_command(1)
+        self.unlock_all_buttons()
         print("[INFO] Executing 'REST' movement...")
 
     def execute_open_movement(self):
+        # Blocking all buttuns until the move is not completed.
         self.lock_all_buttons() 
+        # Sending the move code and starting it's thread.
         self.current_move = 1
-        self.thread_executing_move.args = self.current_move
-        self.thread_executing_move.start()
+        unity_comm.relay_movement_command(1)
+        self.unlock_all_buttons()
         print("[INFO] Executing 'OPEN' movement...")
 
     def execute_close_movement(self):
+        # Blocking all buttuns until the move is not completed.
         self.lock_all_buttons() 
+        # Sending the move code and starting it's thread.
         self.current_move = 2
-        self.thread_executing_move.args = self.current_move
-        self.thread_executing_move.start()
+        unity_comm.relay_movement_command(1)
+        self.unlock_all_buttons()
         print("[INFO] Executing 'CLOSE' movement...")
 
     def execute_flexion_movement(self):
+        # Blocking all buttuns until the move is not completed.
         self.lock_all_buttons() 
+        # Sending the move code and starting it's thread.
         self.current_move = 3
-        self.thread_executing_move.args = self.current_move
-        self.thread_executing_move.start()
+        unity_comm.relay_movement_command(1)
+        self.unlock_all_buttons()
         print("[INFO] Executing 'FLEXION' movement...")
         
     def execute_extension_movement(self):
+        # Blocking all buttuns until the move is not completed.
         self.lock_all_buttons() 
+        # Sending the move code and starting it's thread.
         self.current_move = 4
-        self.thread_executing_move.args = self.current_move
-        self.thread_executing_move.start()
+        unity_comm.relay_movement_command(1)
+        self.unlock_all_buttons()
         print("[INFO] Executing 'EXTENSION' movement...")
 
     def execute_supination_movement(self):
+        # Blocking all buttuns until the move is not completed.
         self.lock_all_buttons() 
+        # Sending the move code and starting it's thread.
         self.current_move = 5
-        self.thread_executing_move.args = self.current_move
-        self.thread_executing_move.start()
+        unity_comm.relay_movement_command(1)
+        self.unlock_all_buttons()
         print("[INFO] Executing 'SUPINATION' movement...")
 
     def execute_pronation_movement(self):
+       # Blocking all buttuns until the move is not completed.
         self.lock_all_buttons() 
+        # Sending the move code and starting it's thread.
         self.current_move = 6
-        self.thread_executing_move.args = self.current_move
-        self.thread_executing_move.start()
+        unity_comm.relay_movement_command(1)
+        self.unlock_all_buttons()
         print("[INFO] Executing 'PRONATION' movement...")
 
     def lock_all_buttons(self):
@@ -120,6 +127,8 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         self.btn_supinacao.setEnabled(True)
         self.btn_pronacao.setEnabled(True)
     
+
+
 def main():
     app = QApplication(sys.argv)
     form = EmgSvmApp()
