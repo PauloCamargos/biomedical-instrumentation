@@ -68,7 +68,7 @@ public class animController : MonoBehaviour
                 Debug.Log("Realizando flexão da mão...");
                 break;
 
-            case "estensao":
+            case "extensao":
                 anim.SetTrigger("play_extensao");
                 Debug.Log("Realizando extensão da mão...");
                 break;

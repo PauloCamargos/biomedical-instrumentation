@@ -61,7 +61,7 @@ class CustomPlotEMG(pg.GraphicsWindow):
     def __init__(self, parent=None,whoami=1): 
         pg.GraphicsWindow.__init__(self, parent=None)
         self.whoami = whoami
-        self.amount_of_points = 15000 
+        self.amount_of_points = 10000 
         self.values = [0] * self.amount_of_points 
 
         self.fps = 0
@@ -90,34 +90,9 @@ class CustomPlotEMG(pg.GraphicsWindow):
 
         timer = pg.QtCore.QTimer(self)         # Temporizador da biblioteca 
         timer.timeout.connect(self.update)  
-        timer.start(50)   
+        timer.start(15)   
         self.x = 0
-
-        print(f"QUEM SOU EU: {self.whoami}")
-
-    @staticmethod
-    def get_data():
-        buffer_plotter = my_arduino_handler.buffer_acquisition
-
-        """ Updates the data and the graph"""
-        # NOTE: FAZER O PLOT COM MAIS DADOS AO INVÉS DE ATUALIZAR PONTO A PONTO
-        points_to_add = buffer_plotter.qsize()
-        # print(f"POINTS TO add: {points_to_add}")
-
-        if points_to_add > 0:
-            for n in range(points_to_add):  # obtains the new value
-                num = buffer_plotter.get()
-                
-                if self.whoami == 1:
-                    _val = num[0]
-                else:
-                    _val = num[1]
-
-                self.values.append(_val)
-                if len(self.values) > self.amount_of_points: # remove the oldest values
-                    self.values.pop(0)
-
-
+        
     def update(self): # este é o data consumer do pyqtgraph
         # if self.show_fps:
         #     self.calculate_fps()

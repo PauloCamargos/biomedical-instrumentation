@@ -50,7 +50,7 @@ def publish_message(client, topic, message):
 
 def relay_movement_command(movement_index=1):
     open_mosquitto_broker()
-    movements = {1:'abre', 2:'fecha', 3:'flexao', 4:'estensao', 5:'supinacao', 6:'pronacao'}
+    movements = {1:'abre', 2:'fecha', 3:'flexao', 4:'extensao', 5:'supinacao', 6:'pronacao'}
 
     # BROKER ADDRESS
     broker = "127.0.0.1"

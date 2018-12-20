@@ -57,7 +57,7 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         self.lock_all_buttons() 
         # Sending the move code and starting it's thread.
         self.current_move = 1
-        unity_comm.relay_movement_command(1)
+        unity_comm.relay_movement_command(self.current_move)
         self.unlock_all_buttons()
         print("[INFO] Executing 'OPEN' movement...")
 
@@ -66,7 +66,7 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         self.lock_all_buttons() 
         # Sending the move code and starting it's thread.
         self.current_move = 2
-        unity_comm.relay_movement_command(1)
+        unity_comm.relay_movement_command(self.current_move)
         self.unlock_all_buttons()
         print("[INFO] Executing 'CLOSE' movement...")
 
@@ -75,7 +75,7 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         self.lock_all_buttons() 
         # Sending the move code and starting it's thread.
         self.current_move = 3
-        unity_comm.relay_movement_command(1)
+        unity_comm.relay_movement_command(self.current_move)
         self.unlock_all_buttons()
         print("[INFO] Executing 'FLEXION' movement...")
         
@@ -84,7 +84,7 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         self.lock_all_buttons() 
         # Sending the move code and starting it's thread.
         self.current_move = 4
-        unity_comm.relay_movement_command(1)
+        unity_comm.relay_movement_command(self.current_move)
         self.unlock_all_buttons()
         print("[INFO] Executing 'EXTENSION' movement...")
 
@@ -93,7 +93,7 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         self.lock_all_buttons() 
         # Sending the move code and starting it's thread.
         self.current_move = 5
-        unity_comm.relay_movement_command(1)
+        unity_comm.relay_movement_command(self.current_move)
         self.unlock_all_buttons()
         print("[INFO] Executing 'SUPINATION' movement...")
 
@@ -102,7 +102,7 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         self.lock_all_buttons() 
         # Sending the move code and starting it's thread.
         self.current_move = 6
-        unity_comm.relay_movement_command(1)
+        unity_comm.relay_movement_command(self.current_move)
         self.unlock_all_buttons()
         print("[INFO] Executing 'PRONATION' movement...")
 
