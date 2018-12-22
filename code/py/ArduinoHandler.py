@@ -20,6 +20,7 @@ if sys.version_info.major == 2:
     from Queue import Queue
 else:
     from queue import Queue
+    from collections import deque
 # ------------------------------------------------------------------------------
 
 
@@ -80,7 +81,7 @@ class ArduinoHandler:
         self.serialPort.port = port_name
         self.serialPort.baudrate = baudrate
         self.thread_acquisition = ThreadHandler(self.acquire_routine, self.close)
-        self.buffer_acquisition = Queue(1024*4)
+        self.buffer_acquisition = deque(maxlen=1024*6)
 
     def update_port_name(self):
         self.serial_tools_obj = None
@@ -98,7 +99,7 @@ class ArduinoHandler:
         """
         The size of the acquisition buffer
         """
-        return self.buffer_acquisition.qsize()
+        return len(self.buffer_acquisition)
 
     def open(self):
         """
@@ -203,7 +204,7 @@ class ArduinoHandler:
                             _value_to_put.append(ArduinoHandler.to_int16(_msb, _lsb))
                     _end_byte = self.serialPort.read()
                     if chr(ord(_end_byte)) == ArduinoConstants.PACKET_END:
-                        self.buffer_acquisition.put(_value_to_put)
+                        self.buffer_acquisition.append(_value_to_put)
 
     def __str__(self):
         return "ArduinoHandlerObject" +\
@@ -212,7 +213,7 @@ class ArduinoHandler:
                "\n\tOpen: " + str(self.serialPort.isOpen()) +\
                "\n\tAcquiring: " + str(self.thread_acquisition.isRunning) +\
                "\n\tInWaiting: " + str(self.serialPort.inWaiting() if self.serialPort.isOpen() else 'Closed') +\
-               "\n\tBufferAcq: " + str(self.buffer_acquisition.qsize())
+               "\n\tBufferAcq: " + str(len(self.buffer_acquisition))
 
     def get_buffers_status(self, separator):
         """
@@ -222,7 +223,7 @@ class ArduinoHandler:
         :return: A string containing the status of all the buffers involved in the acquisition
         """
         return "Serial: %4d" % (self.serialPort.inWaiting()/4 if self.serialPort.isOpen() else 0) + '/' + str(4096/4) +\
-               separator + "Acq: %4d" % (self.buffer_acquisition.qsize()) + '/' + str(self.buffer_acquisition.maxsize)
+               separator + "Acq: %4d" % (len(self.buffer_acquisition)) + '/' + str(self.buffer_acquisition.maxlen)
 
     @staticmethod
     def instance(port_name, baudrate, qnt_ch):
@@ -241,7 +242,7 @@ def test():
 
     def printer():
         if my_arduino_handler.data_waiting:
-            print(my_arduino_handler.buffer_acquisition.get())
+            print(my_arduino_handler.buffer_acquisition.pop())
             # time.sleep(0.01) # Uncomment if you want to see the buffer_acquisition to get full
 
     consumer_thr = ThreadHandler(printer)
@@ -254,7 +255,7 @@ def test():
     # arq.write("leituras = [")
     # def saver():
     #    if my_arduino_handler.data_waiting:
-    #        arq.write(str(my_arduino_handler.buffer_acquisition.get()))
+    #        arq.write(str(my_arduino_handler.buffer_acquisition.pop()))
     #        arq.write(', ')
     # consumer_thr = ThreadHandler(saver)
 

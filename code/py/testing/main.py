@@ -42,17 +42,17 @@ y_pred = clf.predict(X_test)
 lin, = y_test.shape
 y_pred = np.zeros((lin,1))
 
-time.sleep(4)
+#time.sleep(4)
 
 for i in range(0,lin):
     y_pred[i] = clf.predict([X_test[i,:]])
     unitycomm.relay_movement_command(int(y_pred.item(i)))
-    prever_proximo = str(input(">>>> Prever próxima movimento? [Y/n] " ))
+    #prever_proximo = str(input(">>>> Prever próxima movimento? [Y/n] " ))
     
-    print(prever_proximo)
-    if not (prever_proximo == '' or prever_proximo.lower() == 'y'):
-        break
-#    time.sleep(4)
+    #print(prever_proximo)
+    #if not (prever_proximo == '' or prever_proximo.lower() == 'y'):
+    #    break
+    time.sleep(3)
 
 
 

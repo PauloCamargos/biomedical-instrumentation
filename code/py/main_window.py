@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_window.ui'
+# Form implementation generated from reading ui file 'main_window_one_graph.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1038, 932)
+        MainWindow.resize(1071, 907)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -86,22 +86,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.addLayout(self.verticalLayout_3)
         self.horizontalLayout_3.addWidget(self.groupBox)
         self.horizontalLayout_5.addLayout(self.horizontalLayout_3)
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.groupBox_2 = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox_2.setObjectName("groupBox_2")
-        self.horizontalLayout_9 = QtWidgets.QHBoxLayout(self.groupBox_2)
-        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
-        self.graph_svm = QtWidgets.QGraphicsView(self.groupBox_2)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graph_svm.sizePolicy().hasHeightForWidth())
-        self.graph_svm.setSizePolicy(sizePolicy)
-        self.graph_svm.setObjectName("graph_svm")
-        self.horizontalLayout_9.addWidget(self.graph_svm)
-        self.horizontalLayout_4.addWidget(self.groupBox_2)
-        self.horizontalLayout_5.addLayout(self.horizontalLayout_4)
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         self.verticalLayout_7 = QtWidgets.QVBoxLayout()
         self.verticalLayout_7.setObjectName("verticalLayout_7")
@@ -250,24 +234,21 @@ class Ui_MainWindow(object):
         self.groupBox_4.setObjectName("groupBox_4")
         self.verticalLayout_11 = QtWidgets.QVBoxLayout(self.groupBox_4)
         self.verticalLayout_11.setObjectName("verticalLayout_11")
-        self.label_8 = QtWidgets.QLabel(self.groupBox_4)
-        self.label_8.setObjectName("label_8")
-        self.verticalLayout_11.addWidget(self.label_8)
-        self.graphicsView = CustomPlotEMG(self.groupBox_4,whoami=1)
+        self.graphicsView = CustomPlotEMG(self.groupBox_4)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.graphicsView.sizePolicy().hasHeightForWidth())
+        self.graphicsView.setSizePolicy(sizePolicy)
+        self.graphicsView.setMinimumSize(QtCore.QSize(0, 250))
         self.graphicsView.setObjectName("graphicsView")
         self.verticalLayout_11.addWidget(self.graphicsView)
-        self.label_9 = QtWidgets.QLabel(self.groupBox_4)
-        self.label_9.setObjectName("label_9")
-        self.verticalLayout_11.addWidget(self.label_9)
-        self.graphicsView_2 = CustomPlotEMG(self.groupBox_4,whoami=2)
-        self.graphicsView_2.setObjectName("graphicsView_2")
-        self.verticalLayout_11.addWidget(self.graphicsView_2)
         self.verticalLayout_4.addWidget(self.groupBox_4)
         self.verticalLayout_2.addLayout(self.verticalLayout_4)
         self.verticalLayout.addLayout(self.verticalLayout_2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1038, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1071, 21))
         self.menubar.setObjectName("menubar")
         self.menuArquivo = QtWidgets.QMenu(self.menubar)
         self.menuArquivo.setObjectName("menuArquivo")
@@ -294,7 +275,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "EMGsvm"))
         self.groupBox.setTitle(_translate("MainWindow", "Treino"))
         self.label_2.setText(_translate("MainWindow", "Movimentos"))
         self.checkBox_2.setText(_translate("MainWindow", "Supinação"))
@@ -307,7 +288,6 @@ class Ui_MainWindow(object):
         self.pushButton_3.setText(_translate("MainWindow", "Iniciar treino"))
         self.pushButton_2.setText(_translate("MainWindow", "Finalizar treino"))
         self.pushButton.setText(_translate("MainWindow", "Iniciar exercício"))
-        self.groupBox_2.setTitle(_translate("MainWindow", "Exercício"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Posição"))
         self.btn_repouso.setText(_translate("MainWindow", "REPOUSO"))
         self.btn_abrir.setText(_translate("MainWindow", "ABRIR"))
@@ -317,8 +297,6 @@ class Ui_MainWindow(object):
         self.btn_supinacao.setText(_translate("MainWindow", "SUPINAÇÃO"))
         self.btn_pronacao.setText(_translate("MainWindow", "PRONAÇÃO"))
         self.groupBox_4.setTitle(_translate("MainWindow", "Sinal"))
-        self.label_8.setText(_translate("MainWindow", "Canal 1"))
-        self.label_9.setText(_translate("MainWindow", "Canal 2"))
         self.menuArquivo.setTitle(_translate("MainWindow", "Arquivo"))
         self.menuEditar.setTitle(_translate("MainWindow", "Editar"))
         self.menuSobre.setTitle(_translate("MainWindow", "Sobre"))

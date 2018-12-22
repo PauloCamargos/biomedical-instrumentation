@@ -18,39 +18,6 @@ from threading import Thread
 my_arduino_handler = ArduinoHandler.instance(port_name='COM3', baudrate=115200, qnt_ch=2)
 my_arduino_handler.start_acquisition()
 
-buffer_plotter = Queue(4096)
-
-# class ThreadConsumer(Thread):
-#     def __init__(self, my_arduino_handler, buffer_plotter):
-#         Thread.__init__(self)
-#         self.daemon = True
-#         self.running = True
-#         self.my_arduino_handler = my_arduino_handler
-#         self.buffer_plotter = buffer_plotter
-
-#     def run(self):
-#         while self.running:
-#             if my_arduino_handler.data_wating > 0:
-#                 buffer_plotter.put(my_arduino_handler.buffer_acquisition.get())
-
-#     def stop(self):
-#         self.running = False
-
-
-# thr_consumer = ThreadConsumer(my_arduino_handler, buffer_plotter)
-# thr_consumer.start()
-
-# def consumer():
-#     while True:
-#         if my_arduino_handler.data_wating > 0:
-#             buffer_plotter.put(my_arduino_handler.buffer_acquisition.get())
-
-# thr_consumer = Thread(target=consumer)
-# thr_consumer.daemon = True
-# thr_consumer.start()
-# thr_consumer.join()
-
-
 class CustomPlotEMG(pg.GraphicsWindow):
     """
         Implementing a custom class for the pyqtgraph module. It's meant to be used
@@ -58,11 +25,12 @@ class CustomPlotEMG(pg.GraphicsWindow):
         "Embedding widgets inside PyQt applications".
     """
 
-    def __init__(self, parent=None,whoami=1): 
+    def __init__(self, parent=None,): 
         pg.GraphicsWindow.__init__(self, parent=None)
-        self.whoami = whoami
-        self.amount_of_points = 10000 
-        self.values = [0] * self.amount_of_points 
+        self.amount_of_points = 1024*20
+        self.values_ch1 = deque([0 for x in range(self.amount_of_points)], maxlen=self.amount_of_points) # [0] * self.amount_of_points 
+        self.values_ch2 = deque([0 for x in range(self.amount_of_points)], maxlen=self.amount_of_points) # [0] * self.amount_of_points 
+        self.x_tick = deque([0 for x in range(self.amount_of_points)], maxlen=self.amount_of_points)
 
         self.fps = 0
         self.show_fps = True
@@ -71,56 +39,69 @@ class CustomPlotEMG(pg.GraphicsWindow):
         pg.setConfigOptions(antialias=True)             # Bordas das curvas
         self.useOpenGL                            # Configurando engine para renderização do gráfico
         pg.setConfigOptions(useOpenGL=True)
+        pg.setConfigOption('background', 'w')
 
-        limit = 600 
-        self.plot = self.addPlot(title="Sinal EMG")    # Iniciando um plot
-        self.plot.setRange(yRange=[-10,1050])                # Limites do gráfico
-        self.plot.addLegend()                            # Inserindo lengeda
+        limit = [-10, 1100]
+        
+        self.plot_ch1 = self.addPlot(title="CH1", row=1, col=1)    # Iniciando um plot
+        self.plot_ch2 = self.addPlot(title="CH2", row=2, col=1)
+        
+        self.plot_ch1.setRange(yRange=limit)                # Limites do gráfico
+        self.plot_ch2.setRange(yRange=limit)                # Limites do gráfico
+
+        self.plot_ch1.addLegend()                            # Inserindo lengeda
+        self.plot_ch2.addLegend()                            # Inserindo lengeda
+
         # self.plot.showGrid(x = True, y = True, alpha = 0.2)      # Grid para visualização dos valores
-        self.plot.setLabel('left', 'Tensão [V]')         # Legenda do eixo y
+        self.plot_ch1.setLabel('left', 'CH1 [V]')         # Legenda do eixo y
+        self.plot_ch2.setLabel('left', 'CH2 [V]')         # Legenda do eixo y
 
-        if whoami == 1:
-            name = 'CH1'
-            color = 'r'
-        else:
-            name = 'CH2'
-            color = 'b'
-
-        self.curva = self.plot.plot(pen=pg.mkPen(color=color,width=1),name=name)   # Curva do gráfico
-
+        self.curva_ch1 = self.plot_ch1.plot(pen=pg.mkPen(color='g',width=1),name='CH1')   # Curva do gráfico
+        self.curva_ch2 = self.plot_ch2.plot(pen=pg.mkPen(color='b',width=1),name='CH2')   # Curva do gráfico
+        self.plot_ch1.hideAxis('bottom')
+        
+        # x axis values
+        self.x = 0   
+        
         timer = pg.QtCore.QTimer(self)         # Temporizador da biblioteca 
         timer.timeout.connect(self.update)  
-        timer.start(15)   
-        self.x = 0
+        timer.start(0)   
         
     def update(self): # este é o data consumer do pyqtgraph
-        # if self.show_fps:
-        #     self.calculate_fps()
-        #     self.plot.setTitle('<font color="red">%0.2f fps</font>' % self.fps)
-
-        buffer_plotter = my_arduino_handler.buffer_acquisition
-
         """ Updates the data and the graph"""
-        # NOTE: FAZER O PLOT COM MAIS DADOS AO INVÉS DE ATUALIZAR PONTO A PONTO
-        points_to_add = buffer_plotter.qsize()
-        # print(f"POINTS TO add: {points_to_add}")
+        if self.show_fps:
+            self.calculate_fps()
+            self.plot_ch1.setTitle('<font color="red">%0.2f fps</font>' % self.fps)
+
+        # py_time.sleep(1)
+        buffer_plotter =  my_arduino_handler.buffer_acquisition
+
+        # points_to_add = buffer_plotter.qsize()
+        points_to_add = len(buffer_plotter)
+        # print("Buffer size: ", points_to_add)
 
         if points_to_add > 0:
             for n in range(points_to_add):  # obtains the new value
-                num = buffer_plotter.get()
-                
-                if self.whoami == 1:
-                    _val = num[0]
-                else:
-                    _val = num[1]
+                num = buffer_plotter.pop()
+                # print("Read value: ", num)
+                self.values_ch1.append(num[0])
+                self.values_ch2.append(num[1])
 
-                self.values.append(_val)
-                if len(self.values) > self.amount_of_points: # remove the oldest values
-                    self.values.pop(0)
+                self.x_tick.append(self.x)
 
-            self.x += 1
-            self.curva.setData(np.array(self.values[-self.amount_of_points:], dtype='int'))
-            self.curva.setPos(self.x, 0)
+                if len(self.values_ch1) > self.amount_of_points: # remove the oldest values
+                    self.values_ch1.popleft()
+                if len(self.values_ch2) > self.amount_of_points: # remove the oldest values
+                    self.values_ch2.popleft()
+
+                if len(self.x_tick) > self.amount_of_points:
+                    self.x_tick.popleft()
+
+                self.x += 1
+            self.curva_ch1.setData(y=np.array(list(self.values_ch1),dtype='float'))
+            self.curva_ch2.setData(y=np.array(list(self.values_ch2),dtype='float'))
+            self.curva_ch1.setPos(self.x, 0)
+            self.curva_ch2.setPos(self.x, 0)
 
     def calculate_fps(self):
         """

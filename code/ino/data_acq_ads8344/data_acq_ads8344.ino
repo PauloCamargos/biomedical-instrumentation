@@ -4,7 +4,18 @@
  * Borda de descida
  * CPOL: 0
  * SPI_MODE0
- * 
+         ___ 
+CH0  1  | u |  20 +Vcc 
+CH1  2  |   |  19 DCLK
+CH2  3  |   |  18 CS
+CH3  4  |   |  17 Din
+CH4  5  |   |  16 BUSY
+CH5  6  |   |  15 Dout
+CH6  7  |   |  14 GND
+CH7  8  |   |  13 GND
+COM  9  |   |  12 Vcc
+SHDN 10 |___|  11 Vref
+
  * DATASHEET: http://www.ti.com/lit/ds/symlink/ads8344.pdf
  * 
  * **********************
@@ -22,10 +33,10 @@
 
 #include <TimerOne.h>
 // ADC DEFINES
-#define DATAOUT       11 //MOSI 11   // MASTER -> SLAVE (Data out)
-#define DATAIN        12 // MISO 12   // SLAVE -> MASTER  (Data in)
-#define SPICLOCK      13 //SCK  13   // CLOCK PIN
-#define SELPIN 10 // CS   10   // CS = SS no ADS (selection pin)
+#define DATAOUT       11 // MOSI 11   - MASTER -> SLAVE (Data out)
+#define DATAIN        12 // MISO 12   - SLAVE -> MASTER  (Data in)
+#define SPICLOCK      13 // SCK  13   - CLOCK PIN
+#define SELPIN        10 // CS   10   - CS = SS no ADS (selection pin)
 // OUTPUT DEFINES
 #define FREQ_ACQ 2000 // F[Hz] for data sampling
 #define BAUDRATE 115200
