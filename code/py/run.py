@@ -9,6 +9,8 @@ import sys
 import os
 # from ThreadHandler import ThreadHandler # thanks to Ítalo and Andrei (see ThreadHandler docs.)
 import threading
+from customplotemg import CustomPlotEMG
+from ArduinoHandler import ArduinoHandler
 
 #     movements = {1:'abrir', 2:'fechar', 3:'flexionar', 4:'estender', 5:'supinar', 6:'pronar'}
 
@@ -17,7 +19,13 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
     def __init__(self, parent=None):
         super(EmgSvmApp, self).__init__(parent)
         self.setupUi(self)
-        self.current_move = 1 # standard move
+
+        # Pyqtgraph custom widget
+        self.signal_plotter = CustomPlotEMG(my_arduino_handler=ArduinoHandler.instance(port_name='COM3', baudrate=115200, qnt_ch=2))
+        # Adding the pyqtgraph widget to main_window
+        self.GraphLayoutPlaceholder.addWidget(self.signal_plotter)
+        
+
 
         # Thread for the execution of moves in unity. Blocking other buttons until 
         # the move is completed. At the end, this thread execute the
@@ -28,7 +36,9 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         #     on_end_function=self.unlock_all_buttons)
 
         # Setting up the buttons to their respective methods
-        self.setup_connections()        
+        self.setup_connections()  
+        self.current_move = 1 # standard move
+      
 
     def setup_connections(self):
         """
@@ -130,10 +140,19 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
 
 
 def main():
-    app = QApplication(sys.argv)
-    form = EmgSvmApp()
-    form.show()
-    app.exec_()
+    try:
+        app = QApplication(sys.argv)
+        form = EmgSvmApp()
+        form.show()
+        app.exec_()
+        # halting the acquisition, thus releasing the thread
+        form.signal_plotter.my_arduino_handler.stop_acquisition()
+    except Exception as e:
+        print("Unexpected error:",e)
+    finally:
+        print("[OK] Finished application")
+
+
 
 
 if __name__ == "__main__":

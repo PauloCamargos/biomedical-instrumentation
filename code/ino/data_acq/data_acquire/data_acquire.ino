@@ -27,13 +27,13 @@
 
 // Uncoment here if you want to simulate sin and cos function
 // Comment if you want to read analogic pins on arduino
-// #define SIMULATE_TRIGONOMETRY
+//#define SIMULATE_TRIGONOMETRY
 
 
 // Uncoment here to view data on PLOTTER SERIL
 // Coment if you want to send data
 // Doenst work together with SIMULATE_TRIGONOMETRY
-// #define WANT_PLOT
+//#define WANT_PLOT
 
 uint16_t read_analog_value[N_CH];   // holds the ch1 and ch2 read values
 uint16_t rad_angle = 0;
@@ -57,9 +57,9 @@ void setup() {
 // simulating sin and cos function
 void simulate_trigonometry() {
   // Simulating 2 channels
-  read_analog_value[0] = sin(rad_angle * 3.14159 / 180.0) * 100;
+  read_analog_value[0] = sin(rad_angle * 3.14159 / 180.0) * 500 + 500;
   if (N_CH == 2)
-    read_analog_value[1] = cos(rad_angle * 3.14159 / 180.0) * 100;
+    read_analog_value[1] = cos(rad_angle * 3.14159 / 180.0) * 500 + 500;
 
   rad_angle++;
   if (rad_angle == 361)

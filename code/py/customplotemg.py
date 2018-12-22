@@ -13,95 +13,132 @@ from queue import Queue
 from ArduinoHandler import ArduinoHandler
 from ThreadHandler import ThreadHandler
 from collections import deque
-from threading import Thread 
 
-my_arduino_handler = ArduinoHandler.instance(port_name='COM3', baudrate=115200, qnt_ch=2)
-my_arduino_handler.start_acquisition()
 
 class CustomPlotEMG(pg.GraphicsWindow):
     """
-        Implementing a custom class for the pyqtgraph module. It's meant to be used
-        with the PyQt5 Designer. For more information, check out pyqtgraph documentation on 
+        Implementing a custom class for the pyqtgraph module. 
+        For more information, check out pyqtgraph documentation on 
         "Embedding widgets inside PyQt applications".
     """
 
-    def __init__(self, parent=None,): 
+    def __init__(self, parent=None, my_arduino_handler=None): 
+        pg.setConfigOption('background', 'k')
+        #pg.setConfigOption('foreground', 'k')
         pg.GraphicsWindow.__init__(self, parent=None)
-        self.amount_of_points = 1024*20
+        
+        pg.setConfigOptions(antialias=True)          
+        self.useOpenGL
+        pg.setConfigOptions(useOpenGL=True)
+
+        self.my_arduino_handler = my_arduino_handler
+        self.my_arduino_handler.start_acquisition()
+        
+        # signal sampling frequency [Hz]
+        self.sample_frequecy = 2000    
+        # signal sample period [s] 
+        self.sample_period = 1 / self.sample_frequecy 
+         # window time [s] to show the signal
+        self.show_time_window = 5   
+        # obs.: Window time depends on FPS rate and other factors. 
+        # It's a mere aproximation.
+        # index of each point
+        self.sample_index= 0   
+
+        # calculating the number of points that are going
+        # to be plotted
+        self.amount_of_points = int(self.show_time_window / (1 / self.sample_frequecy))
+        
+        # array (deque) holding each channel value (y axis values)
         self.values_ch1 = deque([0 for x in range(self.amount_of_points)], maxlen=self.amount_of_points) # [0] * self.amount_of_points 
         self.values_ch2 = deque([0 for x in range(self.amount_of_points)], maxlen=self.amount_of_points) # [0] * self.amount_of_points 
+        # x axis values
         self.x_tick = deque([0 for x in range(self.amount_of_points)], maxlen=self.amount_of_points)
 
+        # frames per second 
         self.fps = 0
         self.show_fps = True
         self.lastTime = 0
-
-        pg.setConfigOptions(antialias=True)             # Bordas das curvas
-        self.useOpenGL                            # Configurando engine para renderização do gráfico
-        pg.setConfigOptions(useOpenGL=True)
-        pg.setConfigOption('background', 'w')
-
-        limit = [-10, 1100]
-        
-        self.plot_ch1 = self.addPlot(title="CH1", row=1, col=1)    # Iniciando um plot
+       
+        # creating each channel curve
+        self.plot_ch1 = self.addPlot(title="CH1", row=1, col=1) 
         self.plot_ch2 = self.addPlot(title="CH2", row=2, col=1)
+
+        # y axis limits
+        limit = [-10,1050]
+        self.plot_ch1.setRange(yRange=limit)
+        self.plot_ch2.setRange(yRange=limit)
+
+        # adding legend
+        self.plot_ch1.addLegend()
+        self.plot_ch2.addLegend()
         
-        self.plot_ch1.setRange(yRange=limit)                # Limites do gráfico
-        self.plot_ch2.setRange(yRange=limit)                # Limites do gráfico
+        # channel y labels
+        self.plot_ch1.setLabel('left', 'CH1 [V]')
+        self.plot_ch2.setLabel('left', 'CH2 [V]')
 
-        self.plot_ch1.addLegend()                            # Inserindo lengeda
-        self.plot_ch2.addLegend()                            # Inserindo lengeda
+        # channels x labels
+        self.plot_ch1.setLabel('bottom', 'Time')
+        self.plot_ch2.setLabel('bottom', 'Time')
 
-        # self.plot.showGrid(x = True, y = True, alpha = 0.2)      # Grid para visualização dos valores
-        self.plot_ch1.setLabel('left', 'CH1 [V]')         # Legenda do eixo y
-        self.plot_ch2.setLabel('left', 'CH2 [V]')         # Legenda do eixo y
-
-        self.curva_ch1 = self.plot_ch1.plot(pen=pg.mkPen(color='g',width=1),name='CH1')   # Curva do gráfico
-        self.curva_ch2 = self.plot_ch2.plot(pen=pg.mkPen(color='b',width=1),name='CH2')   # Curva do gráfico
+        # channels curves
+        self.curva_ch1 = self.plot_ch1.plot(pen=pg.mkPen(color='g',width=0.9),name='CH1',)
+        self.curva_ch2 = self.plot_ch2.plot(pen=pg.mkPen(color='r',width=0.9),name='CH2')
+        
+         # hiding x axis from ch1
         self.plot_ch1.hideAxis('bottom')
-        
-        # x axis values
-        self.x = 0   
-        
-        timer = pg.QtCore.QTimer(self)         # Temporizador da biblioteca 
+
+        # PyQt timer
+        timer = pg.QtCore.QTimer(self)
+        # Graph updater and arduino handler consumer
         timer.timeout.connect(self.update)  
+        # interval between graph updates
         timer.start(0)   
         
-    def update(self): # este é o data consumer do pyqtgraph
-        """ Updates the data and the graph"""
+    def update(self):
+        """ Updates the data and the graph.
+            This method acts like a consumer of Arduino buffer data.
+            Don't call this method by yourself. 
+            It's running on a thread built by pyqtgraph.
+        """
         if self.show_fps:
             self.calculate_fps()
             self.plot_ch1.setTitle('<font color="red">%0.2f fps</font>' % self.fps)
 
-        # py_time.sleep(1)
-        buffer_plotter =  my_arduino_handler.buffer_acquisition
-
-        # points_to_add = buffer_plotter.qsize()
-        points_to_add = len(buffer_plotter)
-        # print("Buffer size: ", points_to_add)
+        # number of points to be updated
+        points_to_add = len(self.my_arduino_handler.buffer_acquisition)
 
         if points_to_add > 0:
-            for n in range(points_to_add):  # obtains the new value
-                num = buffer_plotter.pop()
-                # print("Read value: ", num)
+            for n in range(points_to_add): 
+                 # obtains the new value
+                num =  self.my_arduino_handler.buffer_acquisition.popleft()
                 self.values_ch1.append(num[0])
                 self.values_ch2.append(num[1])
-
-                self.x_tick.append(self.x)
-
-                if len(self.values_ch1) > self.amount_of_points: # remove the oldest values
+                # updating time axis tick 
+                self.x_tick.append(self.sample_index* self.sample_period)
+                                
+                # remove the oldest values                                
+                if len(self.values_ch1) > self.amount_of_points: 
                     self.values_ch1.popleft()
-                if len(self.values_ch2) > self.amount_of_points: # remove the oldest values
+                if len(self.values_ch2) > self.amount_of_points:
                     self.values_ch2.popleft()
-
                 if len(self.x_tick) > self.amount_of_points:
                     self.x_tick.popleft()
 
-                self.x += 1
-            self.curva_ch1.setData(y=np.array(list(self.values_ch1),dtype='float'))
-            self.curva_ch2.setData(y=np.array(list(self.values_ch2),dtype='float'))
-            self.curva_ch1.setPos(self.x, 0)
-            self.curva_ch2.setPos(self.x, 0)
+                # incresing the sample index
+                self.sample_index+= 1
+                
+        # passing the array of values to plot       
+        self.curva_ch1.setData(
+            x=np.array(list(self.x_tick),dtype='float'), 
+            y=np.array(list(self.values_ch1),dtype='float'))
+        
+        self.curva_ch2.setData(
+            x=np.array(list(self.x_tick),dtype='float'), 
+            y=np.array(list(self.values_ch2),dtype='float'))
+        
+        self.plot_ch2.setLabel('bottom',units='s')
+
 
     def calculate_fps(self):
         """
@@ -118,8 +155,11 @@ class CustomPlotEMG(pg.GraphicsWindow):
             self.fps = self.fps * (1 - s) + (1.0 / dt) * s
 
 
-if __name__ == '__main__': # Função iniciando a execução da janela
-    w = CustomPlotEMG()
+if __name__ == '__main__':
+    my_arduino_handler = ArduinoHandler.instance(port_name='COM3', baudrate=115200, qnt_ch=2)
+
+    w = CustomPlotEMG(my_arduino_handler=my_arduino_handler)
     w.show()
     QtGui.QApplication.instance().exec_()
+    my_arduino_handler.stop_acquisition()
 

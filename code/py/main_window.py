@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_window_one_graph.ui'
+# Form implementation generated from reading ui file 'main_window_label_placeholder.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -231,18 +231,18 @@ class Ui_MainWindow(object):
         self.verticalLayout_4 = QtWidgets.QVBoxLayout()
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.groupBox_4 = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox_4.setObjectName("groupBox_4")
-        self.verticalLayout_11 = QtWidgets.QVBoxLayout(self.groupBox_4)
-        self.verticalLayout_11.setObjectName("verticalLayout_11")
-        self.graphicsView = CustomPlotEMG(self.groupBox_4)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graphicsView.sizePolicy().hasHeightForWidth())
-        self.graphicsView.setSizePolicy(sizePolicy)
-        self.graphicsView.setMinimumSize(QtCore.QSize(0, 250))
-        self.graphicsView.setObjectName("graphicsView")
-        self.verticalLayout_11.addWidget(self.graphicsView)
+        sizePolicy.setHeightForWidth(self.groupBox_4.sizePolicy().hasHeightForWidth())
+        self.groupBox_4.setSizePolicy(sizePolicy)
+        self.groupBox_4.setMinimumSize(QtCore.QSize(0, 250))
+        self.groupBox_4.setObjectName("groupBox_4")
+        self.verticalLayout_11 = QtWidgets.QVBoxLayout(self.groupBox_4)
+        self.verticalLayout_11.setObjectName("verticalLayout_11")
+        self.GraphLayoutPlaceholder = QtWidgets.QVBoxLayout()
+        self.GraphLayoutPlaceholder.setObjectName("GraphLayoutPlaceholder")
+        self.verticalLayout_11.addLayout(self.GraphLayoutPlaceholder)
         self.verticalLayout_4.addWidget(self.groupBox_4)
         self.verticalLayout_2.addLayout(self.verticalLayout_4)
         self.verticalLayout.addLayout(self.verticalLayout_2)
@@ -303,7 +303,6 @@ class Ui_MainWindow(object):
         self.actionSair.setText(_translate("MainWindow", "Sair"))
         self.actionAbrir_game.setText(_translate("MainWindow", "Abrir jogo"))
 
-from customplotemg import CustomPlotEMG
 
 if __name__ == "__main__":
     import sys

@@ -81,7 +81,7 @@ class ArduinoHandler:
         self.serialPort.port = port_name
         self.serialPort.baudrate = baudrate
         self.thread_acquisition = ThreadHandler(self.acquire_routine, self.close)
-        self.buffer_acquisition = deque(maxlen=1024*6)
+        self.buffer_acquisition = deque(maxlen=1024*1)
 
     def update_port_name(self):
         self.serial_tools_obj = None
@@ -234,6 +234,7 @@ class ArduinoHandler:
 
         if not ArduinoHandler.__instance:
             ArduinoHandler.__instance = ArduinoHandler(port_name=port_name, baudrate=baudrate, qnt_ch=qnt_ch)
+        print('[OK] Arduino connection started successfully')
         return ArduinoHandler.__instance
 
 
