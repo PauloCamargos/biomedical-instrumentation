@@ -33,5 +33,5 @@ if __name__ == '__main__':
     imagens = ['abrir', 'extensao', 'fechar',  'flexao', 'pronacao','pronacao1', 'repouso', 'repouso1', 'supinacao','supinacao1']
     for image in imagens:
         scale_image(input_image_path=f'original/{image}.png',
-                    output_image_path=f'scaled/{image}_scaled.png',
-                    width=540*0.25)
+                    output_image_path=f'../view/ui/icons/{image}_small.png',
+                    width=540*0.15)
