@@ -15,12 +15,30 @@ from controller import ArduinoHandler
 
 class CustomPlotEMG(pg.GraphicsWindow):
     """
-        Implementing a custom class for the pyqtgraph module. 
-        For more information, check out pyqtgraph documentation on 
-        "Embedding widgets inside PyQt applications".
+    Implementing a custom class for the pyqtgraph module. 
+    For more information, check out pyqtgraph documentation on 
+    "Embedding widgets inside PyQt applications".
     """
 
-    def __init__(self, parent=None, arduino_handler=None): 
+    def __init__(self, parent=None, arduino_handler):
+        """
+        __init__
+        
+        Initilizaes a new class.
+        
+        Initializes a new CustomPlotEMG class. This class implements 
+        a pyqtgraph realtime graph. 
+        
+        Parameters
+        ----------
+        parent : QWidget, optional
+            the mother object (the default is None)
+        arduino_handler : ArduinoHandler, 
+            An ArduinoHandler object through which data 
+            will arrive
+        
+        """
+
         #pg.setConfigOption('background', 'k')
         #pg.setConfigOption('foreground', 'k')
         pg.GraphicsWindow.__init__(self, parent=None)
@@ -95,11 +113,18 @@ class CustomPlotEMG(pg.GraphicsWindow):
         timer.start(0)   
         
     def update(self):
-        """ Updates the data and the graph.
-            This method acts like a consumer of Arduino buffer data.
-            Don't call this method by yourself. 
-            It's running on a thread built by pyqtgraph.
         """
+        update
+        
+        Updates the graph plotting the points inside a vector
+        
+        Updates the data and the graph. This method acts like a 
+        consumer of Arduino buffer data. 
+        Important: Don't call this method by yourself. It's 
+        running on a thread built by pyqtgraph.
+        
+        """
+
         if self.show_fps:
             self.calculate_fps()
             self.plot_ch1.setTitle('<font color="red">%0.2f fps</font>' % self.fps)

@@ -10,7 +10,6 @@ import os
 from threading import Thread
 from view import customplotemg
 import time as py_time
-
             
 
 class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
@@ -57,7 +56,7 @@ class EmgSvmApp(QMainWindow, main_window.Ui_MainWindow):
         self.btn_pronation.clicked.connect(self.execute_pronation_movement)
 
     ### clicked.connect methods
-    def execute_rest_movement(self):
+    def execute_rest_movement(self, test='a', file):
         self.statusBar.showMessage('Retornando ao descanso')
         # Blocking all buttuns until the move is not completed.
         self.lock_all_buttons() 
