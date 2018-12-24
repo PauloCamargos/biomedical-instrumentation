@@ -5,26 +5,27 @@
 # GRVA - Augumented and Virtual Reality Group
 # ------------------------------------------------------------------------------
 # Author: Paulo Camargos
+# Date: 23/12/2018
 # Contact: paulocamargoss@outlook.com
 # Class: MQTTHandler
 # ------------------------------------------------------------------------------
-# Description: Module containing a handler class for the MQTT protocol with
+# Description: Module containing a handler class for the MQTT protocol for 
 # Python and Mosquitto broker. The paho-mqtt module and the Mosquitto broker
-# Should be installed.
+# should already be installed.
 # To install paho-mqtt module, visit https://pypi.org/project/paho-mqtt/ and
 # follow the given instructions.
-# To install the Mosquitto, visit 
+# To install the Mosquitto broker, visit 
 # http://www.steves-internet-guide.com/install-mosquitto-broker/ 
 # and follow the given instructions. 
 # ------------------------------------------------------------------------------
 import os
-import subprocess
+import platform
 import paho.mqtt.client as mqtt
 from time import sleep
 # ------------------------------------------------------------------------------
 
 
-class MQTTHandler():
+class MQTTHandler:
     """
     MQTTHandler
     
@@ -34,7 +35,6 @@ class MQTTHandler():
     protocol with the Mosquitto broker. For example of use, checkout 
     the test() function at the end of this module.
     """
-
 
     def __init__(self, broker='127.0.0.1', client_name='client', topic='topic', port=1883, receive_message_back=False):
         """
@@ -68,8 +68,6 @@ class MQTTHandler():
 
         self.setup_callback_methods()
 
-        
-
     def setup_callback_methods(self):
         """
         setup_callback_methods
@@ -96,7 +94,11 @@ class MQTTHandler():
         """
 
         print('[INFO] Opening Mosquitto broker...')
-        self.mosquitto_broker = os.popen('mosquitto')
+        if platform.system() == 'Linux':
+            self.mosquitto_broker = os.popen('mosquitto -d')
+        else:
+            self.mosquitto_broker = os.popen('mosquitto')
+
         print('[OK] Success! Mosquitto sever running.')
 
     def close_mosquitto_broker(self):
@@ -224,12 +226,10 @@ class MQTTHandler():
             The message to be published.
         
         """
-
-
         
         if message is not None:
             self.connect_client()
-            self.publish_message(self.topic, message)            
+            self.client.publish(self.topic, message)            
             self.disconnet_client()
         else:
             print('[ERROR] No messagem to relay')

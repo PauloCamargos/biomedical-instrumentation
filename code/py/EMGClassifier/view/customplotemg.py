@@ -20,7 +20,7 @@ class CustomPlotEMG(pg.GraphicsWindow):
     "Embedding widgets inside PyQt applications".
     """
 
-    def __init__(self, parent=None, arduino_handler):
+    def __init__(self, parent=None, arduino_handler=None):
         """
         __init__
         
